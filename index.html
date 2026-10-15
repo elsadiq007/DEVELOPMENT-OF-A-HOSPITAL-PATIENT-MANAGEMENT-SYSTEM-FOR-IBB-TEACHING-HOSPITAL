@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IBB Specialist Hospital Management System</title>
+<style>
+:root{
+  --navy:#132A43;
+  --navy-2:#1B3A5C;
+  --teal:#0E8F82;
+  --teal-light:#E4F5F3;
+  --bg:#F3F6F8;
+  --card:#FFFFFF;
+  --border:#DFE5EB;
+  --ink:#152233;
+  --ink-soft:#5C6B7A;
+  --amber:#C8790A;
+  --amber-bg:#FDF1DF;
+  --red:#B23A32;
+  --red-bg:#FBEAE8;
+  --green:#2E7D4F;
+  --green-bg:#E8F5EC;
+  --blue:#2054A8;
+  --blue-bg:#E9F0FB;
+  --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --radius:10px;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit; cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+::selection{background:var(--teal-light);}
+
+/* Layout shells */
+#app{height:100vh; display:flex; flex-direction:column;}
+
+/* Login screen */
+.login-wrap{
+  height:100vh; display:flex; align-items:center; justify-content:center;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(14,143,130,0.10), transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(19,42,67,0.08), transparent 45%),
+    var(--bg);
+}
+.login-card{
+  width:400px; background:var(--card); border:1px solid var(--border);
+  border-radius:16px; padding:36px 34px 30px; box-shadow:0 20px 50px -25px rgba(19,42,67,0.35);
+}
+.brand{display:flex; align-items:center; gap:10px; margin-bottom:26px;}
+.brand-mark{
+  width:38px;height:38px;border-radius:9px;background:var(--navy);
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;
+  font-family:var(--mono); letter-spacing:-0.5px;
+}
+.brand-name{font-weight:700; font-size:19px; letter-spacing:-0.3px;}
+.brand-sub{font-size:11px; color:var(--ink-soft); letter-spacing:0.08em; text-transform:uppercase; margin-top:1px;}
+.field{margin-bottom:15px;}
+.field label{display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); margin-bottom:6px;}
+.field select, .field input{
+  width:100%; padding:11px 12px; border-radius:8px; border:1.5px solid var(--border);
+  font-size:14px; background:#fbfcfd; color:var(--ink);
+}
+.field select:focus, .field input:focus{outline:none; border-color:var(--teal);}
+.btn{
+  border:none; border-radius:8px; padding:11px 16px; font-size:13.5px; font-weight:600;
+  display:inline-flex; align-items:center; justify-content:center; gap:6px; transition:transform .08s ease, opacity .15s;
+}
+.btn:active{transform:scale(0.98);}
+.btn-primary{background:var(--navy); color:#fff; width:100%; margin-top:6px;}
+.btn-primary:hover{background:var(--navy-2);}
+.btn-teal{background:var(--teal); color:#fff;}
+.btn-teal:hover{opacity:0.9;}
+.btn-ghost{background:transparent; color:var(--ink-soft); border:1.5px solid var(--border);}
+.btn-ghost:hover{border-color:var(--ink-soft);}
+.btn-danger{background:var(--red-bg); color:var(--red);}
+.login-err{background:var(--red-bg); color:var(--red); font-size:12.5px; padding:9px 11px; border-radius:7px; margin-bottom:14px; display:none;}
+.login-foot{margin-top:18px; text-align:center; font-size:11.5px; color:var(--ink-soft);}
+.seed-note{margin-top:14px; font-size:11px; color:var(--ink-soft); background:var(--blue-bg); padding:9px 11px; border-radius:7px; line-height:1.5;}
+.seed-note b{color:var(--blue);}
+
+/* Main shell */
+.shell{display:flex; height:100vh;}
+.sidebar{
+  width:236px; background:var(--navy); color:#fff; display:flex; flex-direction:column; flex-shrink:0;
+}
+.sb-brand{padding:20px 20px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid rgba(255,255,255,0.08);}
+.sb-brand .brand-mark{background:var(--teal);}
+.sb-brand .brand-name{color:#fff; font-size:16px;}
+.sb-role-tag{
+  margin:14px 18px 6px; font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:rgba(255,255,255,0.5); font-weight:700;
+}
+.sb-nav{flex:1; padding:4px 10px; overflow-y:auto;}
+.sb-link{
+  display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px; color:rgba(255,255,255,0.78);
+  font-size:13.5px; font-weight:500; margin-bottom:2px; text-decoration:none; border:none; background:transparent; width:100%; text-align:left;
+}
+.sb-link .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:0.55;flex-shrink:0;}
+.sb-link:hover{background:rgba(255,255,255,0.06); color:#fff;}
+.sb-link.active{background:var(--teal); color:#fff;}
+.sb-link.active .dot{opacity:1;}
+.sb-foot{padding:14px 18px 18px; border-top:1px solid rgba(255,255,255,0.08);}
+.sb-user{font-size:13px; font-weight:600; color:#fff;}
+.sb-user-role{font-size:11px; color:rgba(255,255,255,0.5); text-transform:capitalize;}
+.sb-logout{margin-top:10px; width:100%; background:rgba(255,255,255,0.08); color:#fff; padding:8px; border-radius:7px; font-size:12px; border:none;}
+.sb-logout:hover{background:rgba(255,255,255,0.16);}
+
+.main{flex:1; display:flex; flex-direction:column; min-width:0;}
+.topbar{
+  height:60px; flex-shrink:0; background:var(--card); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; padding:0 24px;
+}
+.tb-title{font-size:16px; font-weight:700; letter-spacing:-0.2px;}
+.tb-sub{font-size:12px; color:var(--ink-soft); margin-top:1px;}
+.tb-actions{display:flex; gap:8px; align-items:center;}
+.clock{font-family:var(--mono); font-size:12px; color:var(--ink-soft);}
+
+.content{flex:1; overflow-y:auto; padding:24px;}
+
+/* Cards & grid */
+.grid{display:grid; gap:16px;}
+.g4{grid-template-columns:repeat(4,1fr);}
+.g3{grid-template-columns:repeat(3,1fr);}
+.g2{grid-template-columns:repeat(2,1fr);}
+@media(max-width:1100px){.g4{grid-template-columns:repeat(2,1fr);} .g3{grid-template-columns:repeat(2,1fr);}}
+
+.card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px;}
+.card-title{font-size:14px; font-weight:700; margin:0 0 2px;}
+.card-sub{font-size:12px; color:var(--ink-soft); margin:0 0 14px;}
+.stat-card .stat-num{font-size:28px; font-weight:700; font-family:var(--mono); letter-spacing:-1px;}
+.stat-card .stat-label{font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); font-weight:700; margin-top:2px;}
+.section-label{font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); font-weight:700; margin:26px 0 10px;}
+.section-label:first-child{margin-top:0;}
+
+table{width:100%; border-collapse:collapse; font-size:13px;}
+th{text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); padding:8px 10px; border-bottom:1.5px solid var(--border); font-weight:700;}
+td{padding:10px 10px; border-bottom:1px solid var(--border); vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#FAFBFC;}
+.rid{font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); background:#F0F3F5; padding:2px 6px; border-radius:5px;}
+
+.pill{display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; padding:4px 9px; border-radius:20px; white-space:nowrap;}
+.pill .d{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.pill-blue{background:var(--blue-bg); color:var(--blue);}
+.pill-teal{background:var(--teal-light); color:var(--teal);}
+.pill-green{background:var(--green-bg); color:var(--green);}
+.pill-amber{background:var(--amber-bg); color:var(--amber);}
+.pill-red{background:var(--red-bg); color:var(--red);}
+.pill-grey{background:#EEF1F3; color:var(--ink-soft);}
+
+.empty{padding:34px 10px; text-align:center; color:var(--ink-soft); font-size:13px;}
+.empty b{display:block; color:var(--ink); font-size:14px; margin-bottom:4px;}
+
+/* Modal */
+.overlay{
+  position:fixed; inset:0; background:rgba(19,42,67,0.45); display:none; align-items:flex-start; justify-content:center;
+  z-index:100; padding:40px 16px; overflow-y:auto;
+}
+.overlay.open{display:flex;}
+.modal{background:#fff; border-radius:14px; width:560px; max-width:100%; box-shadow:0 30px 60px -20px rgba(0,0,0,0.35); animation:pop .15s ease;}
+@keyframes pop{from{transform:translateY(8px); opacity:0;} to{transform:translateY(0); opacity:1;}}
+.modal-head{padding:18px 22px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;}
+.modal-head h3{margin:0; font-size:15.5px;}
+.modal-x{background:none; border:none; font-size:18px; color:var(--ink-soft); line-height:1;}
+.modal-body{padding:20px 22px; max-height:65vh; overflow-y:auto;}
+.modal-foot{padding:16px 22px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px;}
+.row2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;}
+textarea{resize:vertical; min-height:70px;}
+.hint{font-size:11.5px; color:var(--ink-soft); margin-top:4px;}
+
+.toast-wrap{position:fixed; bottom:20px; right:20px; z-index:200; display:flex; flex-direction:column; gap:8px;}
+.toast{background:var(--navy); color:#fff; padding:11px 16px; border-radius:9px; font-size:13px; box-shadow:0 10px 24px -8px rgba(0,0,0,0.35); animation:in .18s ease;}
+@keyframes in{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+.list-item{display:flex; align-items:center; justify-content:space-between; padding:12px 4px; border-bottom:1px solid var(--border);}
+.list-item:last-child{border-bottom:none;}
+.li-main .name{font-weight:600; font-size:13.5px;}
+.li-main .meta{font-size:11.5px; color:var(--ink-soft); margin-top:2px;}
+.actions-inline{display:flex; gap:6px;}
+.btn-sm{padding:6px 11px; font-size:12px; border-radius:7px;}
+.badge-count{background:var(--red); color:#fff; font-size:10px; font-weight:700; border-radius:10px; padding:1px 6px; margin-left:6px;}
+
+.search-bar{display:flex; gap:8px; margin-bottom:16px;}
+.search-bar input{flex:1; padding:10px 13px; border-radius:8px; border:1.5px solid var(--border); font-size:13.5px;}
+.search-bar input:focus{outline:none; border-color:var(--teal);}
+
+.vitals-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:4px;}
+.vitals-grid .field label{font-size:10px;}
+.tag-list{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+.k-v{display:flex; justify-content:space-between; font-size:12.5px; padding:6px 0; border-bottom:1px dashed var(--border);}
+.k-v span:first-child{color:var(--ink-soft);}
+.detail-header{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px;}
+.subtle-btn{background:none;border:none;color:var(--teal);font-size:12.5px;font-weight:600;padding:0;}
+hr.thin{border:none;border-top:1px solid var(--border); margin:16px 0;}
+.checklist label{display:flex; align-items:center; gap:8px; font-size:13px; padding:6px 0; cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- Hospital settings (name, logo, colors) — edit hospital-config.js, not this file -->
+<script src="hospital-config.js" onerror="window.__configMissing = true;"></script>
+
+<script>
+
+const DB_KEY = "IBB Hospital Management System_db";
+const SESSION_KEY = "IBB Hospital Management System_session";
+
+//Hospital settings
+const DEFAULT_CONFIG = {
+  facilityName: "IBB Specialist Hospital Minna",
+  tagline: "HOSPITAL MANAGEMENT SYSTEM",
+  logoFile: "logo.png",
+  colors: { primary:"#132A43", primaryDark:"#1B3A5C", accent:"#0E8F82", accentLight:"#E4F5F3", background:"#F3F6F8", amber:"#C8790A", green:"#2E7D4F", blue:"#2054A8", red:"#B23A32" },
+  address:"Minna, Niger State", phone:"09160823362", currency:"₦"
+};
+const CFG = (typeof HOSPITAL_CONFIG !== "undefined") ? Object.assign({}, DEFAULT_CONFIG, HOSPITAL_CONFIG, {colors: Object.assign({}, DEFAULT_CONFIG.colors, (HOSPITAL_CONFIG||{}).colors||{})}) : DEFAULT_CONFIG;
+const CONFIG_LOADED = (typeof HOSPITAL_CONFIG !== "undefined");
+
+function applyTheme(){
+  const r = document.documentElement.style;
+  const c = CFG.colors;
+  r.setProperty("--navy", c.primary);
+  r.setProperty("--navy-2", c.primaryDark);
+  r.setProperty("--teal", c.accent);
+  r.setProperty("--teal-light", c.accentLight);
+  r.setProperty("--bg", c.background);
+  r.setProperty("--amber", c.amber);
+  r.setProperty("--green", c.green);
+  r.setProperty("--blue", c.blue);
+  r.setProperty("--red", c.red);
+}
+applyTheme();
+
+function logoImgHTML(size){
+  return `<img src="${CFG.logoFile}" alt="logo" style="width:${size}px;height:${size}px;border-radius:9px;object-fit:cover;flex-shrink:0;" onerror="this.outerHTML='<div class=&quot;brand-mark&quot; style=&quot;width:${size}px;height:${size}px;&quot;>${CFG.facilityName.slice(0,2).toUpperCase()}</div>'">`;
+}
+
+/* API client PHP/MySQL backend */
+const API_BASE = "api/"; 
+
+async function api(path, options = {}){
+  const res = await fetch(API_BASE + path, {
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    ...options
+  });
+  const data = await res.json().catch(()=>({}));
+  if(!res.ok){
+    throw new Error(data.error || "Request failed (" + res.status + ")");
+  }
+  return data;
+}
+const apiGet  = (path) => api(path, { method: "GET" });
+const apiPost = (path, body) => api(path, { method: "POST", body: JSON.stringify(body) });
+const apiPut  = (path, body) => api(path, { method: "PUT", body: JSON.stringify(body) });
+
+function uid(prefix){
+  return prefix + "-" + Date.now().toString(36).slice(-5) + Math.random().toString(36).slice(2,6);
+}
+function nowISO(){ return new Date().toISOString(); }
+function fmtDate(iso){
+  if(!iso) return "—";
+  const d = new Date(iso);
+  return d.toLocaleDateString(undefined,{month:'short',day:'2-digit',year:'numeric'}) + " · " + d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//LOGIN STAFF DETAILS
+function seedDB(){
+  const admin = { id: uid("usr"), name:"System Administrator", username:"admin", pin:"2001", role:"admin", active:true };
+  return {
+    meta:{ facilityName:"IBB Specialist Hospital Minna",version:1 },
+    users:[
+      admin,
+      { id: uid("usr"), name:"Habib Muhammad", username:"receptionist", pin:"1111", role:"receptionist", active:true },
+      { id: uid("usr"), name:"Halima Ndayako", username:"nurse", pin:"1111", role:"nurse", active:true },
+      { id: uid("usr"), name:"Dr. Yusuf Haruna", username:"doctor1", pin:"1111", role:"doctor", active:true },
+      { id: uid("usr"), name:"Dr. Amirah Bukar Satomi", username:"doctor2", pin:"1111", role:"doctor", active:true },
+      { id: uid("usr"), name:"Pharm. Fatima", username:"pharmacy", pin:"1111", role:"pharmacy", active:true }
+    ],
+    patients:[],
+    visits:[],
+    activityLog:[{ time: nowISO(), user:"System", action:"Database initialized" }]
+  };
+} 
+
+function saveDB(){ /* no-op: server is now the source of truth */ }
+function log(action){
+  DB.activityLog.unshift({ time: nowISO(), user: SESSION ? SESSION.name : "System", action });
+  if(DB.activityLog.length > 500) DB.activityLog.length = 500;
+}
+
+let DB = { users:[], patients:[], visits:[], activityLog:[] };
+
+// Pulls the latest patients, visits (with prescriptions), and activity log from the backend
+async function refreshData(){
+  if(!SESSION) return;
+  try{
+    const [patients, visits] = await Promise.all([
+      apiGet("patients.php"),
+      apiGet("visits.php"),
+    ]);
+    DB.patients = patients.map(p=>({
+      id: p.id, name: p.name, age: p.age || "—", gender: p.gender,
+      phone: p.phone, address: p.address, registeredAt: p.created_at
+    }));
+    DB.visits = visits.map(mapVisitFromApi);
+
+    if(SESSION.role === "admin"){
+      const [users, activity] = await Promise.all([
+        apiGet("users.php"),
+        apiGet("activity.php"),
+      ]);
+      DB.users = users.map(u=>({ id:u.id, name:u.name, username:u.username, role:u.role, active: !!u.active, createdAt: u.created_at }));
+      DB.activityLog = activity.map(a=>({ time:a.created_at, user:a.user_name, action:a.action }));
+    }
+  }catch(e){
+    toast("Could not load data from server: " + e.message);
+  }
+}
+
+function mapVisitFromApi(v){
+  const stageMap = {
+    checked_in:"checked-in", with_doctor:"with-doctor",
+    pharmacy_pending:"pharmacy-pending", ready_checkout:"ready-checkout", completed:"completed"
+  };
+  const prescriptions = (v.prescriptions || []).map(rx=>({
+    id: rx.id, drug: rx.drug_name, dosage: rx.dosage, qty: rx.instructions || "",
+    dispensed: !!rx.dispensed
+  }));
+  return {
+    id: v.id,
+    patientId: v.patient_id,
+    roomNumber: v.room_number || "",
+    admitted: Number(v.admitted || 0) === 1,
+    stage: stageMap[v.stage] || v.stage,
+    createdAt: v.checkin_time,
+    vitals: v.temperature || v.blood_pressure || v.pulse || v.weight_kg ? {
+      bp: v.blood_pressure, temp: v.temperature, weight: v.weight_kg, pulse: v.pulse,
+      recordedAt: v.vitals_at
+    } : null,
+    notes: v.doctor_notes || "",
+    diagnosis: v.diagnosis || "",
+    prescriptions,
+    pharmacy: prescriptions.length ? { status: prescriptions.every(rx=>rx.dispensed) ? "done" : "pending" } : null,
+    invoice: { items:[{label:"Consultation Fee", amount:2000}], paid: v.stage === "completed" },
+    completedAt: v.checkout_time
+  };
+}
+let SESSION = null;
+function toast(msg){
+  const wrap = document.getElementById("toastWrap");
+  const t = document.createElement("div");
+  t.className = "toast"; t.textContent = msg;
+  wrap.appendChild(t);
+  setTimeout(()=>{ t.style.opacity="0"; t.style.transition="opacity .3s"; setTimeout(()=>t.remove(),300); }, 2600);
+}
+
+/* Staaff Dash board color */
+const ROLE_META = {
+  admin:     { label:"Administrator", color:"navy" },
+  receptionist: { label:"Receptionist", color:"blue" },
+  nurse:     { label:"Nurse", color:"teal" },
+  doctor:    { label:"Doctor", color:"green" },
+  pharmacy:  { label:"Pharmacy", color:"amber" }
+};
+
+const NAV = {
+  admin:[
+    {id:"admin-overview", label:"Overview"},
+    {id:"admin-users", label:"Staff & Roles"},
+    {id:"admin-patients", label:"All Patients"},
+    {id:"admin-data", label:"Backup & Restore"},
+    {id:"admin-reports", label:"Illness Reports"},
+    {id:"admin-log", label:"Activity Log"}
+  ],
+  receptionist:[
+    {id:"fd-register", label:"Register Patient"},
+    {id:"fd-checkin", label:"Patient Check-In"},
+    {id:"fd-checkout", label:"Patient Check-Out"},
+    {id:"fd-patients", label:"Patient Records"},
+    {id:"fd-room-search", label:"Visitor / Room Search"}
+  ],
+  nurse:[
+    {id:"nurse-queue", label:"Waiting for Vitals"},
+    {id:"nurse-patients", label:"Patient List"}
+  ],
+  doctor:[
+    {id:"doctor-queue", label:"Waiting for Doctor"},
+    {id:"doctor-patients", label:"Patient List"}
+  ],
+  pharmacy:[
+    {id:"pharm-queue", label:"Prescriptions Queue"},
+    {id:"pharm-history", label:"Dispensed History"}
+  ]
+};
+
+let currentTab = null;
+
+async function logout(){
+  try{ await apiPost("auth.php?action=logout", {}); }catch(e){ /* ignore, log out locally regardless */ }
+  SESSION = null;
+  render();
+}
+
+function render(){
+  const app = document.getElementById("app");
+  if(!SESSION){
+    app.innerHTML = loginScreen();
+    bindLogin();
+    return;
+  }
+  if(!currentTab || !NAV[SESSION.role].find(n=>n.id===currentTab)){
+    currentTab = NAV[SESSION.role][0].id;
+  }
+  app.innerHTML = shellScreen();
+  document.getElementById("tabContent").innerHTML = renderTab(currentTab);
+  bindShell();
+  bindTab(currentTab);
+}
+
+// Login screen page //
+
+function loginScreen(){
+  return `
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="brand">
+        ${logoImgHTML(38)}
+        <div>
+          <div class="brand-name">${CFG.facilityName}</div>
+          <div class="brand-sub">${CFG.tagline}</div>
+        </div>
+      </div>
+      ${!CONFIG_LOADED ? `<div class="seed-note" style="background:var(--amber-bg); margin-bottom:14px;"><b>Note:</b> hospital-config.js wasn't found next to this file, so default settings are shown. Keep both files in the same folder.</div>` : ""}
+      <div class="login-err" id="loginErr">Incorrect username or PIN. Try again.</div>
+      <div class="field">
+        <label>Staff Member</label>
+        <select id="loginUsername"><option value="">Loading staff…</option></select>
+      </div>
+      <div class="field">
+        <label>PIN</label>
+        <input id="loginPin" type="password" inputmode="numeric" maxlength="8" placeholder=" " autocomplete="current-password">
+      </div>
+      <button class="btn btn-primary" id="loginBtn">Sign In</button>
+ </div>
+  </div>`;
+}
+async function bindLogin(){
+  document.getElementById("loginBtn").onclick = doLogin;
+  document.getElementById("loginPin").addEventListener("keydown", e=>{ if(e.key==="Enter") doLogin(); });
+
+  try{
+    const roster = await apiGet("roster.php");
+    const sel = document.getElementById("loginUsername");
+    sel.innerHTML = roster.map(u=>
+      `<option value="${u.username}">${u.name} — ${ROLE_META[u.role] ? ROLE_META[u.role].label : u.role}</option>`
+    ).join("");
+  }catch(e){
+    document.getElementById("loginUsername").innerHTML = `<option value="">Could not load staff list</option>`;
+  }
+}
+async function doLogin(){
+  const username = document.getElementById("loginUsername").value.trim();
+  const pin = document.getElementById("loginPin").value;
+  const errEl = document.getElementById("loginErr");
+  errEl.style.display = "none";
+
+  try{
+    const { user } = await apiPost("auth.php?action=login", { username, pin });
+    SESSION = user;
+    await refreshData();
+    currentTab = null;
+    render();
+  }catch(e){
+    errEl.textContent = e.message || "Incorrect username or PIN. Try again.";
+    errEl.style.display = "block";
+  }
+}
+
+
+// Sidebar //
+function shellScreen(){
+  const nav = NAV[SESSION.role];
+  const pending = countPendingForRole(SESSION.role);
+  return `
+  <div class="shell">
+    <div class="sidebar">
+      <div class="sb-brand">
+        ${logoImgHTML(32)}
+        <div class="brand-name">${CFG.facilityName}</div>
+      </div>
+      <div class="sb-role-tag">${ROLE_META[SESSION.role].label}</div>
+      <div class="sb-nav">
+        ${nav.map(n=>{
+          const badge = n.id.endsWith("queue")||n.id.endsWith("checkin") ? (pending[n.id] ? `<span class="badge-count">${pending[n.id]}</span>`:"") : "";
+          return `<button class="sb-link ${n.id===currentTab?'active':''}" data-tab="${n.id}"><span class="dot"></span>${n.label}${badge}</button>`;
+        }).join("")}
+      </div>
+      <div class="sb-foot">
+        <div class="sb-user">${SESSION.name}</div>
+        <div class="sb-user-role">${ROLE_META[SESSION.role].label}</div>
+        <button class="sb-logout" id="logoutBtn">Sign Out</button>
+      </div>
+    </div>
+    <div class="main">
+      <div class="topbar">
+        <div>
+          <div class="tb-title" id="tbTitle">${NAV[SESSION.role].find(n=>n.id===currentTab).label}</div>
+          <div class="tb-sub">${fmtToday()}</div>
+        </div>
+        <div class="tb-actions">
+          <span class="clock" id="clock"></span>
+        </div>
+      </div>
+      <div class="content" id="tabContent"></div>
+    </div>
+  </div>
+  <div class="overlay" id="overlay"><div class="modal" id="modalRoot"></div></div>
+  `;
+}
+function fmtToday(){
+  return new Date().toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric', year:'numeric'});
+}
+function bindShell(){
+  document.querySelectorAll(".sb-link").forEach(btn=>{
+    btn.onclick = ()=>{ currentTab = btn.dataset.tab; render(); };
+  });
+  document.getElementById("logoutBtn").onclick = logout;
+  tickClock();
+}
+let clockTimer = null;
+function tickClock(){
+  clearInterval(clockTimer);
+  const el = document.getElementById("clock");
+  function upd(){ if(el) el.textContent = new Date().toLocaleTimeString(); }
+  upd();
+  clockTimer = setInterval(upd, 1000);
+}
+
+function countPendingForRole(role){
+  const c = {};
+  c["nurse-queue"] = DB.visits.filter(v=>v.stage==="checked-in").length;
+  c["doctor-queue"] = DB.visits.filter(v=>v.stage==="with-doctor").length;
+  c["pharm-queue"] = DB.visits.filter(v=>v.pharmacy && v.pharmacy.status==="pending").length;
+  c["fd-checkin"] = DB.visits.filter(v=>v.stage==="ready-checkout").length;
+  return c;
+}
+
+// Modal helpers to assign infor //
+function openModal(html, onOpen){
+  document.getElementById("modalRoot").innerHTML = html;
+  document.getElementById("overlay").classList.add("open");
+  const closers = document.querySelectorAll("[data-close-modal]");
+  closers.forEach(b=>b.onclick = closeModal);
+  document.getElementById("overlay").onclick = (e)=>{ if(e.target.id==="overlay") closeModal(); };
+  if(onOpen) onOpen();
+}
+function closeModal(){ document.getElementById("overlay").classList.remove("open"); }
+
+// Stage pill labels //
+function stagePill(v){
+  const map = {
+    "checked-in": ["pill-blue","Checked In"],
+    "with-doctor": ["pill-green","With Doctor"],
+    "pharmacy-pending": ["pill-amber","Pharmacy Pending"],
+    "ready-checkout": ["pill-teal","Ready for Checkout"],
+    "completed": ["pill-grey","Completed"]
+  };
+  const m = map[v.stage] || ["pill-grey", v.stage];
+  return `<span class="pill ${m[0]}"><span class="d"></span>${m[1]}</span>`;
+}
+function patientById(id){ return DB.patients.find(p=>p.id===id); }
+function visitById(id){ return DB.visits.find(v=>v.id===id); }
+function activeVisitForPatient(pid){
+  return DB.visits.filter(v=>v.patientId===pid && v.stage!=="completed").sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt))[0];
+}
+
+// Render Tab Display //
+function renderTab(tab){
+  switch(tab){
+    case "admin-overview": return adminOverview();
+    case "admin-reports": return adminReports();
+    case "admin-users": return adminUsers();
+    case "admin-patients": return adminPatients();
+    case "admin-data": return adminData();
+    case "admin-log": return adminLog();
+    case "fd-checkin": return fdCheckin();
+    case "fd-register": return fdRegister();
+    case "fd-checkout": return fdCheckout();
+    case "fd-patients": return patientDirectory("receptionist");
+    case "fd-room-search": return fdRoomSearch();
+    case "nurse-queue": return nurseQueue();
+    case "nurse-patients": return patientDirectory("nurse");
+    case "doctor-queue": return doctorQueue();
+    case "doctor-patients": return patientDirectory("doctor");
+    case "pharm-queue": return pharmQueue();
+    case "pharm-history": return pharmHistory();
+    default: return "<div class='empty'>Not found.</div>";
+  }
+}
+function bindTab(tab){
+  switch(tab){
+    case "admin-overview": break;
+    case "admin-reports": bindAdminReports(); break;
+    case "admin-users": bindAdminUsers(); break;
+    case "admin-patients": bindAdminPatients(); break;
+    case "admin-data": bindAdminData(); break;
+    case "admin-log": break;
+    case "fd-checkin": bindFdCheckin(); break;
+    case "fd-register": bindFdRegister(); break;
+    case "fd-checkout": bindFdCheckout(); break;
+    case "fd-patients": bindPatientDirectory("receptionist"); break;
+    case "fd-room-search": bindFdRoomSearch(); break;
+    case "nurse-queue": bindNurseQueue(); break;
+    case "nurse-patients": bindPatientDirectory("nurse"); break;
+    case "doctor-queue": bindDoctorQueue(); break;
+    case "doctor-patients": bindPatientDirectory("doctor"); break;
+    case "pharm-queue": bindPharmQueue(); break;
+    case "pharm-history": break;
+  }
+}
+
+// Illness Report //
+function adminReports(){
+  return `
+  <div class="card">
+    <div class="card-title">Illness Percentage by Month</div>
+    <div class="card-sub">Shows each recorded diagnosis as a percentage of all diagnosed visits in the same month.</div>
+    <div id="illnessReportBody"><div class="empty"><b>Loading report…</b>Fetching diagnosed visits from the database.</div></div>
+  </div>`;
+}
+async function bindAdminReports(){
+  const body = document.getElementById("illnessReportBody");
+  if(!body) return;
+  try{
+    const data = await apiGet("reports.php");
+    const rows = data.rows || [];
+    if(!rows.length){
+      body.innerHTML = `<div class="empty"><b>No diagnosis data yet</b>Once doctors record diagnoses, the monthly illness report will appear here.</div>`;
+      return;
+    }
+    const months = [...new Set(rows.map(r=>r.report_month))];
+    body.innerHTML = months.map(month=>{
+      const monthRows = rows.filter(r=>r.report_month===month);
+      const label = monthRows[0].month_label;
+      return `
+        <div class="section-label" style="margin-top:22px;">${label}</div>
+        <table>
+          <thead><tr><th>Illness / Diagnosis</th><th>Cases</th><th>Percentage</th></tr></thead>
+          <tbody>
+            ${monthRows.map(r=>`
+              <tr>
+                <td><b>${r.diagnosis}</b></td>
+                <td>${r.cases}</td>
+                <td style="min-width:230px;">
+                  <div style="display:flex;align-items:center;gap:9px;">
+                    <div style="height:8px;background:var(--teal);border-radius:5px;width:${Math.min(100, Number(r.percentage))}%;max-width:140px;"></div>
+                    <b>${Number(r.percentage).toFixed(2)}%</b>
+                  </div>
+                </td>
+              </tr>`).join("")}
+          </tbody>
+        </table>`;
+    }).join("");
+  }catch(e){
+    body.innerHTML = `<div class="empty"><b>Could not load report</b>${e.message}</div>`;
+  }
+}
+
+// ROOM SEARCH. //
+function fdRoomSearch(){
+  return `
+  <div class="card">
+    <div class="card-title">Visitor / Room Search</div>
+    <div class="card-sub">Search an admitted patient by name, phone number, or room number when a visitor comes to the hospital.</div>
+    <div class="search-bar">
+      <input id="roomSearch" placeholder="Search patient name, phone or room number…">
+    </div>
+    <div id="roomSearchResults">
+      <div class="empty"><b>Search for a patient</b>Enter the patient's name, phone number or room number above.</div>
+    </div>
+  </div>`;
+}
+function bindFdRoomSearch(){
+  const input = document.getElementById("roomSearch");
+  const results = document.getElementById("roomSearchResults");
+  if(!input || !results) return;
+
+  function draw(value){
+    const q = (value||"").trim().toLowerCase();
+    if(!q){
+      results.innerHTML = `<div class="empty"><b>Search for a patient</b>Enter the patient's name, phone number or room number above.</div>`;
+      return;
+    }
+    const matches = DB.visits
+      .filter(v=>v.stage!=="completed" && v.admitted)
+      .map(v=>({v,p:patientById(v.patientId)}))
+      .filter(x=>x.p && (
+        x.p.name.toLowerCase().includes(q) ||
+        (x.p.phone||"").toLowerCase().includes(q) ||
+        (x.v.roomNumber||"").toLowerCase().includes(q)
+      ));
+
+    if(!matches.length){
+      results.innerHTML = `<div class="empty"><b>No active patient found</b>Try the patient's name, phone number or room number.</div>`;
+      return;
+    }
+
+    results.innerHTML = `<table>
+      <thead><tr><th>Patient</th><th>Room Number</th><th>Phone</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        ${matches.map(({v,p})=>`
+          <tr>
+            <td><b>${p.name}</b><div class="meta" style="font-size:11px;color:var(--ink-soft);">${p.age} · ${p.gender}</div></td>
+            <td>${v.roomNumber ? `<span class="pill pill-blue"><span class="d"></span>${v.roomNumber}</span>` : '<span class="pill pill-grey"><span class="d"></span>Room not assigned</span>'}</td>
+            <td>${p.phone||'—'}</td>
+            <td>${stagePill(v)}</td>
+            <td><button class="btn btn-ghost btn-sm" data-set-room="${v.id}">Assign Room</button></td>
+          </tr>`).join("")}
+      </tbody>
+    </table>`;
+  }
+
+  input.addEventListener("input", e=>draw(e.target.value));
+
+  results.addEventListener("click", e=>{
+    const btn = e.target.closest("[data-set-room]");
+    if(!btn) return;
+    const v = visitById(btn.dataset.setRoom);
+    const p = patientById(v.patientId);
+    openModal(`
+      <div class="modal-head"><h3>Assign Room — ${p.name}</h3><button class="modal-x" data-close-modal>×</button></div>
+      <div class="modal-body">
+        <div class="hint" style="margin-bottom:10px;">This patient is admitted. Assign a room number for the visitor desk.</div><div class="field"><label>Room Number</label><input id="setRoomNumber" value="${v.roomNumber||''}" placeholder="e.g. A-12"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" data-close-modal>Cancel</button>
+        <button class="btn btn-primary" id="saveRoomBtn" style="width:auto;">Save Room</button>
+      </div>
+    `, ()=>{
+      document.getElementById("saveRoomBtn").onclick = async ()=>{
+        const room = document.getElementById("setRoomNumber").value.trim();
+        const saveBtn = document.getElementById("saveRoomBtn");
+        saveBtn.disabled = true;
+        try{
+          await apiPut("visits.php?action=room", {visit_id:v.id, room_number:room});
+          await refreshData();
+          closeModal();
+          draw(input.value);
+          toast(room ? `Room ${room} assigned to ${p.name}.` : `Room removed for ${p.name}.`);
+        }catch(e){
+          toast("Could not update room: " + e.message);
+          saveBtn.disabled = false;
+        }
+      };
+    });
+  });
+}
+
+// Admin //
+function adminOverview(){
+  const totalPatients = DB.patients.length;
+  const activeVisits = DB.visits.filter(v=>v.stage!=="completed").length;
+  const completedToday = DB.visits.filter(v=>v.stage==="completed" && isToday(v.completedAt)).length;
+  const staffActive = DB.users.filter(u=>u.active).length;
+  return `
+  <div class="grid g4">
+    <div class="card stat-card"><div class="stat-num">${totalPatients}</div><div class="stat-label">Total Patients</div></div>
+    <div class="card stat-card"><div class="stat-num">${activeVisits}</div><div class="stat-label">Active Visits</div></div>
+    <div class="card stat-card"><div class="stat-num">${completedToday}</div><div class="stat-label">Completed Today</div></div>
+    <div class="card stat-card"><div class="stat-num">${staffActive}</div><div class="stat-label">Active Staff</div></div>
+  </div>
+  <div class="section-label">Current Patient status</div>
+  <div class="grid g3">
+    ${pipelineCard("Reception / Checkout", DB.visits.filter(v=>v.stage==="ready-checkout").length, "blue")}
+    ${pipelineCard("With Nurse", DB.visits.filter(v=>v.stage==="checked-in").length, "teal")}
+    ${pipelineCard("With Doctor", DB.visits.filter(v=>v.stage==="with-doctor").length, "green")}
+    ${pipelineCard("with Pharmacy", DB.visits.filter(v=>v.pharmacy && v.pharmacy.status==="pending").length, "amber")}
+    ${pipelineCard("Completed (all time)", DB.visits.filter(v=>v.stage==="completed").length, "grey")}
+  </div>
+  <div class="section-label">Recent Activity</div>
+  <div class="card">${activityListHTML(DB.activityLog.slice(0,8))}</div>
+  `;
+}
+function pipelineCard(label, num, color){
+  return `<div class="card"><div class="card-sub" style="margin-bottom:8px;">${label}</div><div class="pill pill-${color}" style="font-size:16px; padding:6px 12px;"><span class="d"></span>${num}</div></div>`;
+}
+function isToday(iso){
+  if(!iso) return false;
+  const d = new Date(iso), t = new Date();
+  return d.toDateString()===t.toDateString();
+}
+function activityListHTML(items){
+  if(!items.length) return `<div class="empty">No activity yet.</div>`;
+  return items.map(a=>`<div class="list-item"><div class="li-main"><div class="name">${a.action}</div><div class="meta">${a.user} · ${fmtDate(a.time)}</div></div></div>`).join("");
+}
+
+function adminUsers(){
+  return `
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+    <div class="card-sub" style="margin:0;">Create staff accounts, assign roles, and deactivate access.</div>
+    <button class="btn btn-teal btn-sm" id="addUserBtn">+ New Staff</button>
+  </div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        ${DB.users.map(u=>`
+          <tr>
+            <td><b>${u.name}</b></td>
+            <td><span class="rid">${u.username}</span></td>
+            <td>${ROLE_META[u.role].label}</td>
+            <td>${u.active ? `<span class="pill pill-green"><span class="d"></span>Active</span>` : `<span class="pill pill-red"><span class="d"></span>Deactivated</span>`}</td>
+            <td>
+              <div class="actions-inline">
+                <button class="btn btn-ghost btn-sm" data-edit="${u.id}">Edit</button>
+                <button class="btn ${u.active?'btn-danger':'btn-teal'} btn-sm" data-toggle="${u.id}">${u.active?'Deactivate':'Activate'}</button>
+              </div>
+            </td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  </div>`;
+}
+function userFormHTML(u){
+  const isEdit = !!u;
+  return `
+  <div class="modal-head"><h3>${isEdit?'Edit Staff Member':'New Staff Member'}</h3><button class="modal-x" data-close-modal>×</button></div>
+  <div class="modal-body">
+    <div class="field"><label>Full Name</label><input id="ufName" value="${u?u.name:''}" placeholder="e.g. Amaka Obi"></div>
+    <div class="row2">
+      <div class="field"><label>Username</label><input id="ufUsername" value="${u?u.username:''}" placeholder="e.g. amaka"></div>
+      <div class="field"><label>PIN (4–8 digits)${isEdit?' — leave blank to keep current PIN':''}</label><input id="ufPin" value="" placeholder="1111"></div>
+    </div>
+    <div class="field">
+      <label>Role</label>
+      <select id="ufRole">
+        ${Object.keys(ROLE_META).map(r=>`<option value="${r}" ${u&&u.role===r?'selected':''}>${ROLE_META[r].label}</option>`).join("")}
+      </select>
+    </div>
+    <div class="hint">Roles determine which parts of the system this staff member can see and use, matching the front desk → nurse → doctor → pharmacy workflow.</div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-ghost" data-close-modal>Cancel</button>
+    <button class="btn btn-primary" id="ufSave" style="width:auto;">${isEdit?'Save Changes':'Create Staff'}</button>
+  </div>`;
+}
+function bindAdminUsers(){
+  document.getElementById("addUserBtn").onclick = ()=>{
+    openModal(userFormHTML(null), ()=>{
+      document.getElementById("ufSave").onclick = async ()=>{
+        const name = document.getElementById("ufName").value.trim();
+        const username = document.getElementById("ufUsername").value.trim();
+        const pin = document.getElementById("ufPin").value.trim();
+        const role = document.getElementById("ufRole").value;
+        if(!name || !username || !pin){ toast("Please fill all fields."); return; }
+        const btn = document.getElementById("ufSave");
+        btn.disabled = true;
+        try{
+          await apiPost("users.php", { name, username, pin, role });
+          await refreshData();
+          closeModal(); render(); toast("Staff account created.");
+        }catch(e){
+          toast("Could not create account: " + e.message);
+          btn.disabled = false;
+        }
+      };
+    });
+  };
+  document.querySelectorAll("[data-edit]").forEach(b=>{
+    b.onclick = ()=>{
+      const u = DB.users.find(x=>x.id===b.dataset.edit);
+      openModal(userFormHTML(u), ()=>{
+        document.getElementById("ufSave").onclick = async ()=>{
+          const name = document.getElementById("ufName").value.trim();
+          const username = document.getElementById("ufUsername").value.trim();
+          const pin = document.getElementById("ufPin").value.trim();
+          const role = document.getElementById("ufRole").value;
+          const btn = document.getElementById("ufSave");
+          btn.disabled = true;
+          try{
+            await apiPut("users.php", { id: u.id, name, username, role, active: u.active, pin: pin || undefined });
+            await refreshData();
+            closeModal(); render(); toast("Staff account updated.");
+          }catch(e){
+            toast("Could not update account: " + e.message);
+            btn.disabled = false;
+          }
+        };
+      });
+    };
+  });
+  document.querySelectorAll("[data-toggle]").forEach(b=>{
+    b.onclick = async ()=>{
+      const u = DB.users.find(x=>x.id===b.dataset.toggle);
+      if(u.id===SESSION.id){ toast("You can't deactivate the account you're signed in with."); return; }
+      try{
+        await apiPut("users.php", { id: u.id, name: u.name, role: u.role, active: u.active ? 0 : 1 });
+        await refreshData();
+        render(); toast(!u.active?"Account activated.":"Account deactivated.");
+      }catch(e){
+        toast("Could not update account: " + e.message);
+      }
+    };
+  });
+}
+
+function adminPatients(){ return patientDirectory("admin"); }
+function bindAdminPatients(){ bindPatientDirectory("admin"); }
+
+function adminData(){
+  return `
+  <div class="section-label" style="margin-top:0;">Database</div>
+  <div class="card">
+    <div class="card-title" style="display:flex;align-items:center;gap:8px;">Connected <span class="pill pill-green"><span class="d"></span>MySQL</span></div>
+    <div class="card-sub" style="margin-bottom:0;">
+      This system now stores every record — patients, visits, prescriptions, staff, and activity — in a shared MySQL database on your server, accessed through the PHP API. All staff computers on the network see the same live data; there's nothing to sync manually anymore.
+      For backups, use your normal MySQL backup process (e.g. <span class="rid">mysqldump</span>) on the server rather than downloading a file from here.
+    </div>
+  </div>
+  <div class="section-label">Hospital Name, Logo &amp; Colors</div>
+  <div class="card">
+    <div class="card-sub" style="margin-bottom:0;">
+      These are controlled by the <span class="rid">hospital-config.js</span> file sitting next to this app (and the <span class="rid">logo.png</span> it points to) — not by a button in here. Open <span class="rid">hospital-config.js</span> in any text editor to change the facility name, tagline, address, currency symbol, or theme colors, save it, then refresh this page.
+    </div>
+  </div>
+  <div class="section-label">Danger Zone</div>
+  <div class="card">
+    <div class="card-sub" style="margin-bottom:10px;">Wiping all patients, visits, and activity history is a database-level operation now (to protect against accidental data loss from the browser). Ask your database administrator to run a script against the MySQL database directly if this is ever needed.</div>
+  </div>
+  `;
+}
+
+function adminLog(){
+  return `<div class="card">${activityListHTML(DB.activityLog)}</div>`;
+}
+
+// Receptionist //
+function fdRegister(){
+  return `
+  <div class="card" style="max-width:640px;">
+    <div class="card-title">New Patient Registration</div>
+    <div class="card-sub">Create a patient record.</div>
+    <div class="row2">
+      <div class="field"><label>Full Name</label><input id="rgName" placeholder=""></div>
+      <div class="field"><label>Age</label><input id="rgAge" type="number" min="0" placeholder=""></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Gender</label>
+        <select id="rgGender"><option>Female</option><option>Male</option><option>Other</option></select>
+      </div>
+      <div class="field"><label>Phone Number</label><input id="rgPhone" placeholder=""></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Address</label><input id="rgAddress" placeholder=""></div>
+    </div>
+    <button class="btn btn-primary" id="rgSubmit" style="width:auto; margin-top:6px;">Register & Check In</button>
+  </div>`;
+}
+function bindFdRegister(){
+  document.getElementById("rgSubmit").onclick = async ()=>{
+    const name = document.getElementById("rgName").value.trim();
+    if(!name){ toast("Patient name is required."); return; }
+    const btn = document.getElementById("rgSubmit");
+    btn.disabled = true;
+    try{
+      const patientBody = {
+        name,
+        age: document.getElementById("rgAge").value || null,
+        gender: document.getElementById("rgGender").value,
+        phone: document.getElementById("rgPhone").value.trim(),
+        address: document.getElementById("rgAddress").value.trim(),
+      };
+      const { id: patientId } = await apiPost("patients.php", patientBody);
+      await apiPost("visits.php?action=checkin", {
+        patient_id: patientId
+      });
+
+      await refreshData();
+      toast(`${name} registered and checked in.`);
+      ["rgName","rgAge","rgPhone","rgAddress"].forEach(id=>document.getElementById(id).value="");
+      render();
+    }catch(e){
+      toast("Could not register patient: " + e.message);
+    }finally{
+      btn.disabled = false;
+    }
+  };
+}
+
+function fdCheckin(){
+  const visits = DB.visits.filter(v=>v.stage!=="completed").sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  return `
+      ${!visits.length ? `<div class="empty"><b>No active visits</b>Register a patient to start the queue.</div>` :
+    `<table>
+      <thead><tr><th>Patient</th><th>Reason</th><th>Stage</th><th>Checked In</th><th></th></tr></thead>
+      <tbody>
+        ${visits.map(v=>{
+          const p = patientById(v.patientId);
+          return `<tr>
+            <td><b>${p.name}</b><div class="meta" style="font-size:11px;color:var(--ink-soft);">${p.age} · ${p.gender}</div></td>
+            <td>${v.reason || '—'}</td>
+            <td>${stagePill(v)}</td>
+            <td>${fmtDate(v.createdAt)}</td>
+            <td><button class="btn btn-ghost btn-sm" data-view="${v.id}">View</button></td>
+          </tr>`;
+        }).join("")}
+      </tbody>
+    </table>`}
+  </div>`;
+}
+function bindFdCheckin(){
+  document.querySelectorAll("[data-view]").forEach(b=> b.onclick = ()=> openVisitDetail(b.dataset.view, "receptionist"));
+}
+
+function fdCheckout(){
+  const visits = DB.visits.filter(v=>v.stage==="ready-checkout");
+  return `
+    ${!visits.length ? `<div class="empty"><b>Nothing to check out</b>Patients appear here once their care is complete.</div>` :
+    visits.map(v=>{
+      const p = patientById(v.patientId);
+      const total = v.invoice.items.reduce((s,i)=>s+Number(i.amount||0),0);
+      return `<div class="list-item">
+        <div class="li-main">
+          <div class="name">${p.name}</div>
+        </div>
+        <div class="actions-inline">
+          <button class="btn btn-ghost btn-sm" data-view="${v.id}">View Record</button>
+          <button class="btn btn-teal btn-sm" data-checkout="${v.id}">Checkout & Print Prescription</button>
+        </div>
+      </div>`;
+    }).join("")}
+  </div>`;
+}
+function bindFdCheckout(){
+  document.querySelectorAll("[data-view]").forEach(b=> b.onclick = ()=> openVisitDetail(b.dataset.view, "receptionist"));
+  document.querySelectorAll("[data-checkout]").forEach(b=>{
+    b.onclick = async ()=>{
+      const v = visitById(b.dataset.checkout);
+      const p = patientById(v.patientId);
+      try{
+        await apiPut("visits.php?action=checkout", { visit_id: v.id });
+        openPrescriptionPrint(v,p);
+        await refreshData();
+        render();
+      }catch(e){
+        toast("Could not check out patient: " + e.message);
+      }
+    };
+  });
+}
+
+function openPrescriptionPrint(v,p){
+  const total = v.invoice.items.reduce((s,i)=>s+Number(i.amount||0),0);
+  const html = `
+  <div class="modal-head"><h3>Visit Summary — ${p.name}</h3><button class="modal-x" data-close-modal>×</button></div>
+  <div class="modal-body">
+    <div class="k-v"><span>Patient</span><span>${p.name} (${p.age}, ${p.gender})</span></div>
+    <div class="k-v"><span>Diagnosis</span><span>${v.diagnosis || '—'}</span></div>
+    <div class="section-label">Prescription</div>
+    ${v.prescriptions.length ? v.prescriptions.map(rx=>`<div class="k-v"><span>${rx.drug} — ${rx.dosage}</span><span>${rx.dispensed?'Dispensed':'Pending'}</span></div>`).join("") : `<div class="hint">No medication prescribed.</div>`}
+    <div class="section-label">Invoice</div>
+    ${v.invoice.items.map(i=>`<div class="k-v"><span>${i.label}</span><span>${CFG.currency}${Number(i.amount).toLocaleString()}</span></div>`).join("")}
+    <div class="k-v"><span><b>Total</b></span><span><b>${CFG.currency}${total.toLocaleString()}</b></span></div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-ghost" data-close-modal>Close</button>
+    <button class="btn btn-primary" style="width:auto;" onclick="window.print()">Print</button>
+  </div>`;
+  openModal(html);
+}
+
+// NURSE //
+function nurseQueue(){
+  const visits = DB.visits.filter(v=>v.stage==="checked-in").sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt));
+  return `
+    ${!visits.length ? `<div class="empty"><b>Queue is empty</b>New check-ins from the front desk will appear here.</div>` :
+    visits.map(v=>{
+      const p = patientById(v.patientId);
+      return `<div class="list-item">
+        <div class="li-main"><div class="name">${p.name}</div><div class="meta">· Checked in ${fmtDate(v.createdAt)}</div></div>
+        <div class="actions-inline">
+          <button class="btn btn-teal btn-sm" data-vitals="${v.id}">Record Vitals & Send to Doctor</button>
+        </div>
+      </div>`;
+    }).join("")}
+  </div>`;
+}
+function bindNurseQueue(){
+  document.querySelectorAll("[data-vitals]").forEach(b=>{
+    b.onclick = ()=>{
+      const v = visitById(b.dataset.vitals);
+      const p = patientById(v.patientId);
+      openModal(`
+        <div class="modal-head"><h3>Vitals — ${p.name}</h3><button class="modal-x" data-close-modal>×</button></div>
+        <div class="modal-body">
+          <div class="vitals-grid">
+            <div class="field"><label>BP (mmHg)</label><input id="vBP" placeholder="120/80"></div>
+            <div class="field"><label>Temp (°C)</label><input id="vTemp" placeholder="36.8"></div>
+            <div class="field"><label>Weight (kg)</label><input id="vWeight" placeholder="70"></div>
+            <div class="field"><label>Pulse (bpm)</label><input id="vPulse" placeholder="78"></div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn btn-ghost" data-close-modal>Cancel</button>
+          <button class="btn btn-primary" id="vSave" style="width:auto;">Send to Doctor</button>
+        </div>
+      `, ()=>{
+        document.getElementById("vSave").onclick = async ()=>{
+          const btn = document.getElementById("vSave");
+          btn.disabled = true;
+          try{
+            await apiPut("visits.php?action=vitals", {
+              visit_id: v.id,
+              blood_pressure: document.getElementById("vBP").value || null,
+              temperature: document.getElementById("vTemp").value || null,
+              weight_kg: document.getElementById("vWeight").value || null,
+              pulse: document.getElementById("vPulse").value || null,
+            });
+            await refreshData();
+            closeModal(); render(); toast("Vitals saved. Patient sent to doctor.");
+          }catch(e){
+            toast("Could not save vitals: " + e.message);
+            btn.disabled = false;
+          }
+        };
+      });
+    };
+  });
+}
+
+// DOCTOR //
+function doctorQueue(){
+  const visits = DB.visits.filter(v=>v.stage==="with-doctor").sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt));
+  return `
+  <div class="card-sub" style="margin-bottom:12px;">Patients with vitals recorded, waiting for examination.</div>
+  <div class="card">
+    ${!visits.length ? `<div class="empty"><b>No patients waiting</b>Patients appear after the nurse records vitals.</div>` :
+    visits.map(v=>{
+      const p = patientById(v.patientId);
+      return `<div class="list-item">
+        <div class="li-main">
+          <div class="name">${p.name}</div>
+          <div class="meta">BP ${v.vitals?.bp||'—'} · Temp ${v.vitals?.temp||'—'}°C · Pulse ${v.vitals?.pulse||'—'} bpm</div>
+        </div>
+        <div class="actions-inline"><button class="btn btn-teal btn-sm" data-exam="${v.id}">Examine Patient</button></div>
+      </div>`;
+    }).join("")}
+  </div>`;
+}
+function bindDoctorQueue(){
+  document.querySelectorAll("[data-exam]").forEach(b=>{
+    b.onclick = ()=>{
+      const v = visitById(b.dataset.exam);
+      const p = patientById(v.patientId);
+      openModal(`
+        <div class="modal-head"><h3>Examine — ${p.name}</h3><button class="modal-x" data-close-modal>×</button></div>
+        <div class="modal-body">
+          <div class="k-v"><span>Vitals</span><span>BP ${v.vitals?.bp||'—'} · Temp ${v.vitals?.temp||'—'}°C · Wt ${v.vitals?.weight||'—'}kg · Pulse ${v.vitals?.pulse||'—'}</span></div>
+          ${v.vitals?.nurseNotes ? `<div class="k-v"><span>Nurse Note</span><span>${v.vitals.nurseNotes}</span></div>` : ""}
+          <div class="field" style="margin-top:12px;"><label>Symptoms / Examination Notes</label><textarea id="dNotes">${v.notes||''}</textarea></div>
+          <div class="field"><label>Diagnosis</label><input id="dDiag" value="${v.diagnosis||''}" placeholder=""></div>
+          <label style="display:flex;align-items:center;gap:9px;margin:14px 0 8px;cursor:pointer;">
+            <input id="dAdmit" type="checkbox" ${v.admitted ? "checked" : ""}>
+            <span><b>Admit patient</b><span class="hint" style="display:block;margin-top:2px;">Tick this only if the patient is being admitted. The room will be assigned separately by reception.</span></span>
+          </label>
+          <div class="section-label">Prescribe Medication (sends to Pharmacy)</div>
+          <div id="rxRows">
+            ${(v.prescriptions.length?v.prescriptions:[{drug:"",dosage:"",qty:""}]).map((rx,i)=>rxRowHTML(rx,i)).join("")}
+          </div>
+          <button class="subtle-btn" id="addRxRow" type="button">+ Add another medication</button>
+        </div>
+        <div class="modal-foot">
+          <button class="btn btn-ghost" data-close-modal>Cancel</button>
+          <button class="btn btn-primary" id="dSave" style="width:auto;">Save & Route Patient</button>
+        </div>
+      `, ()=>{
+        document.getElementById("addRxRow").onclick = ()=>{
+          document.getElementById("rxRows").insertAdjacentHTML("beforeend", rxRowHTML({drug:"",dosage:"",qty:""}, document.querySelectorAll(".rx-row").length));
+        };
+        document.getElementById("dSave").onclick = async ()=>{
+          const notes = document.getElementById("dNotes").value.trim();
+          const diagnosis = document.getElementById("dDiag").value.trim();
+          const admitted = document.getElementById("dAdmit").checked;
+          const rxRows = document.querySelectorAll(".rx-row");
+          const prescriptions = [];
+          rxRows.forEach(row=>{
+            const drug = row.querySelector(".rxDrug").value.trim();
+            const dosage = row.querySelector(".rxDosage").value.trim();
+            const qty = row.querySelector(".rxQty").value.trim();
+            if(drug) prescriptions.push({ drug_name: drug, dosage, instructions: qty });
+          });
+
+          const btn = document.getElementById("dSave");
+          btn.disabled = true;
+          try{
+            await apiPut("visits.php?action=consult", {
+              visit_id: v.id,
+              diagnosis,
+              doctor_notes: notes,
+              admitted,
+              prescriptions,
+            });
+            await refreshData();
+            closeModal(); render(); toast("Examination saved.");
+          }catch(e){
+            toast("Could not save examination: " + e.message);
+            btn.disabled = false;
+          }
+        };
+      });
+    };
+  });
+}
+function rxRowHTML(rx,i){
+  return `<div class="row3 rx-row" style="margin-bottom:8px;">
+    <input class="rxDrug" value="${rx.drug||''}" placeholder="Drug name">
+    <input class="rxDosage" value="${rx.dosage||''}" placeholder="Dosage">
+    <input class="rxQty" value="${rx.qty||''}" placeholder="Qty">
+  </div>`;
+}
+
+// PHARMACY //
+function pharmQueue(){
+  const visits = DB.visits.filter(v=>v.pharmacy && v.pharmacy.status==="pending");
+  return `
+  <div class="card-sub" style="margin-bottom:12px;">Prescriptions sent by doctors, waiting to be dispensed.</div>
+  <div class="card">
+    ${!visits.length ? `<div class="empty"><b>No pending prescriptions</b></div>` :
+    visits.map(v=>{
+      const p = patientById(v.patientId);
+      return `<div class="list-item">
+        <div class="li-main"><div class="name">${p.name}</div><div class="meta">${v.prescriptions.map(rx=>rx.drug).join(", ")}</div></div>
+        <div class="actions-inline"><button class="btn btn-teal btn-sm" data-dispense="${v.id}">Dispense</button></div>
+      </div>`;
+    }).join("")}
+  </div>`;
+}
+function bindPharmQueue(){
+  document.querySelectorAll("[data-dispense]").forEach(b=>{
+    b.onclick = ()=>{
+      const v = visitById(b.dataset.dispense);
+      const p = patientById(v.patientId);
+      openModal(`
+        <div class="modal-head"><h3>Dispense — ${p.name}</h3><button class="modal-x" data-close-modal>×</button></div>
+        <div class="modal-body">
+          <div class="checklist">
+            ${v.prescriptions.map((rx,i)=>`<label><input type="checkbox" class="dispCheck" data-i="${i}" ${rx.dispensed?'checked':''}> ${rx.drug} — ${rx.dosage} ${rx.qty?`(x${rx.qty})`:''}</label>`).join("")}
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn btn-ghost" data-close-modal>Cancel</button>
+          <button class="btn btn-primary" id="dispSave" style="width:auto;">Update Status</button>
+        </div>
+      `, ()=>{
+        document.getElementById("dispSave").onclick = async ()=>{
+          const dispensedIds = [];
+          document.querySelectorAll(".dispCheck").forEach(cb=>{
+            if(cb.checked) dispensedIds.push(v.prescriptions[cb.dataset.i].id);
+          });
+
+          const btn = document.getElementById("dispSave");
+          btn.disabled = true;
+          try{
+            const { all_dispensed } = await apiPut("visits.php?action=dispense", {
+              visit_id: v.id,
+              dispensed_ids: dispensedIds,
+            });
+            await refreshData();
+            closeModal(); render(); toast(all_dispensed ? "All medication dispensed." : "Progress saved.");
+          }catch(e){
+            toast("Could not update dispensing status: " + e.message);
+            btn.disabled = false;
+          }
+        };
+      });
+    };
+  });
+}
+function pharmHistory(){
+  const visits = DB.visits.filter(v=>v.pharmacy && v.pharmacy.status==="done");
+  return `<div class="card">${!visits.length ? `<div class="empty"><b>Nothing dispensed yet</b></div>` :
+    `<table><thead><tr><th>Patient</th><th>Medication</th><th>Status</th></tr></thead><tbody>
+    ${visits.map(v=>{const p=patientById(v.patientId); return `<tr><td>${p.name}</td><td>${v.prescriptions.map(rx=>rx.drug).join(", ")}</td><td><span class="pill pill-green"><span class="d"></span>Dispensed</span></td></tr>`}).join("")}
+    </tbody></table>`}</div>`;
+}
+
+function advanceAfterPharmacy(v){
+  const pharmacyDone = !v.pharmacy || v.pharmacy.status === "done";
+  v.stage = pharmacyDone ? "ready-checkout" : "pharmacy-pending";
+}
+
+// Patient list //
+function patientDirectory(ctx){
+  return `
+  <div class="search-bar"><input id="pdSearch" placeholder="Search patients by name or phone…"></div>
+  <div class="card" id="pdList"></div>
+  `;
+}
+function bindPatientDirectory(ctx){
+  const listEl = document.getElementById("pdList");
+  function draw(filter){
+    const f = (filter||"").toLowerCase();
+    const patients = DB.patients.filter(p=> p.name.toLowerCase().includes(f) || (p.phone||"").includes(f));
+    if(!patients.length){ listEl.innerHTML = `<div class="empty"><b>No patients found</b>${DB.patients.length? 'Try a different search.' : 'Register a patient from Front Desk first.'}</div>`; return; }
+    listEl.innerHTML = `<table><thead><tr><th>Name</th><th>Age/Gender</th><th>Phone</th><th>Room</th><th>Last Visit</th><th></th></tr></thead><tbody>
+      ${patients.map(p=>{
+        const v = activeVisitForPatient(p.id) || DB.visits.filter(v=>v.patientId===p.id).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt))[0];
+        return `<tr>
+          <td><b>${p.name}</b></td>
+          <td>${p.age} / ${p.gender}</td>
+          <td>${p.phone||'—'}</td>
+          <td>${v && v.roomNumber ? `<span class="pill pill-blue"><span class="d"></span>${v.roomNumber}</span>` : '—'}</td>
+          <td>${v ? stagePill(v) : `<span class="pill pill-grey"><span class="d"></span>No visits</span>`}</td>
+          <td><button class="btn btn-ghost btn-sm" data-open="${p.id}">Open</button></td>
+        </tr>`;
+      }).join("")}
+    </tbody></table>`;
+    listEl.querySelectorAll("[data-open]").forEach(b=>{
+      b.onclick = ()=>{
+        const p = patientById(b.dataset.open);
+        const v = activeVisitForPatient(p.id) || DB.visits.filter(v=>v.patientId===p.id).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt))[0];
+        if(v) openVisitDetail(v.id, ctx); else openPatientOnlyDetail(p);
+      };
+    });
+  }
+  draw("");
+  document.getElementById("pdSearch").addEventListener("input", (e)=>draw(e.target.value));
+}
+function openPatientOnlyDetail(p){
+  openModal(`
+    <div class="modal-head"><h3>${p.name}</h3><button class="modal-x" data-close-modal>×</button></div>
+    <div class="modal-body">
+      <div class="k-v"><span>Age / Gender</span><span>${p.age} / ${p.gender}</span></div>
+      <div class="k-v"><span>Phone</span><span>${p.phone||'—'}</span></div>
+      <div class="k-v"><span>Address</span><span>${p.address||'—'}</span></div>
+      <div class="k-v"><span>Registered</span><span>${fmtDate(p.registeredAt)}</span></div>
+      <div class="hint" style="margin-top:10px;">No visit history yet.</div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" data-close-modal>Close</button></div>
+  `);
+}
+function openVisitDetail(visitId, ctx){
+  const v = visitById(visitId);
+  const p = patientById(v.patientId);
+  openModal(`
+    <div class="modal-head"><h3>${p.name}</h3><button class="modal-x" data-close-modal>×</button></div>
+    <div class="modal-body">
+      <div class="detail-header">
+        ${stagePill(v)}
+        <span class="hint">Checked in ${fmtDate(v.createdAt)}</span>
+      </div>
+      <div class="k-v"><span>Age / Gender</span><span>${p.age} / ${p.gender}</span></div>
+      <div class="k-v"><span>Phone</span><span>${p.phone||'—'}</span></div>
+      <div class="k-v"><span>Admission</span><span>${v.admitted ? (v.roomNumber ? `Admitted — Room ${v.roomNumber}` : "Admitted — Room not assigned") : "Not admitted"}</span></div>
+      <hr class="thin">
+      <div class="section-label" style="margin-top:0;">Vitals</div>
+      ${v.vitals ? `
+        <div class="k-v"><span>BP</span><span>${v.vitals.bp||'—'}</span></div>
+        <div class="k-v"><span>Temp</span><span>${v.vitals.temp||'—'} °C</span></div>
+        <div class="k-v"><span>Weight</span><span>${v.vitals.weight||'—'} kg</span></div>
+        <div class="k-v"><span>Pulse</span><span>${v.vitals.pulse||'—'} bpm</span></div>
+      ` : `<div class="hint">Not recorded yet.</div>`}
+      <div class="section-label">Doctor's Notes</div>
+      <div class="hint">${v.notes || 'Not examined yet.'}</div>
+      <div class="k-v"><span>Diagnosis</span><span>${v.diagnosis||'—'}</span></div>
+      <div class="section-label">Prescriptions</div>
+      ${v.prescriptions.length ? v.prescriptions.map(rx=>`<div class="k-v"><span>${rx.drug} — ${rx.dosage}</span><span>${rx.dispensed?'Dispensed':'Pending'}</span></div>`).join("") : `<div class="hint">None</div>`}
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" data-close-modal>Close</button></div>
+  `);
+}
+
+// Start Up/Boot //
+(async function boot(){
+  try{
+    const { user } = await apiGet("auth.php?action=session");
+    SESSION = user || null;
+    if(SESSION) await refreshData();
+  }catch(e){
+    SESSION = null;
+  }
+  render();
+})();
+</script>
+</body>
+</html>
